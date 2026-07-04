@@ -2,6 +2,6 @@
 .include "hdr.asm"
 
 .section ".rodata1" superfree
-.include "res/gfx/bgs/pvsneslibfont_data.as" ; 3076 bytes
-.include "res/gfx/bgs/pvsneslib_data.as" ; 14368 bytes
+.include "res/gfx/bgs/pvsneslibfont_data.as" ; 1540 bytes
+.include "res/gfx/bgs/pvsneslib_data.as" ; 14624 bytes
 .ends
