@@ -1,0 +1,12 @@
+[objects]
+src/gui.obj
+src/main.obj
+src/sine_lut.obj
+src/wave.obj
+data.obj
+hdr.obj
+src/wave_rebuild.obj
+e:\Ferramentas\+projects\ROMDev\SNESDev\tools\snesdev\pvsneslib\lib\HiROM_FastROM/crt0_snes.obj
+e:\Ferramentas\+projects\ROMDev\SNESDev\tools\snesdev\pvsneslib\lib\HiROM_FastROM/libc.obj
+e:\Ferramentas\+projects\ROMDev\SNESDev\tools\snesdev\pvsneslib\lib\HiROM_FastROM/libm.obj
+e:\Ferramentas\+projects\ROMDev\SNESDev\tools\snesdev\pvsneslib\lib\HiROM_FastROM/libtcc.obj
