@@ -107,25 +107,17 @@ waveRebuildHdmaTable:
     lda.l sine_lut_2d,x         ; 16-bit signed displacement
     sta.b tcc__r0               ; temp in ZP (D=0, so this is correct)
 
-    ; --- Write 3-byte HDMA entry ---
+    ; --- Write 2-byte HDMA entry (Indirect mode) ---
     lda 7,s                     ;
     tax                         ; X = output buffer pointer (WRAM addr)
 
-    sep #$20
-.accu 8
-    lda #$01
-    sta.l $7E0000,x             ; byte 0: scanline count = 1
-    lda.b tcc__r0               ; displacement low byte
-    sta.l $7E0001,x             ; byte 1: scroll_lo
-    lda.b tcc__r0+1             ; displacement high byte
-    sta.l $7E0002,x             ; byte 2: scroll_hi
-    rep #$20
-.accu 16
+    lda.b tcc__r0               ; 16-bit displacement
+    sta.l $7E0000,x             ; write scroll_lo and scroll_hi (2 bytes)
 
-    ; --- Advance output pointer by 3 ---
+    ; --- Advance output pointer by 2 ---
     lda 7,s
     clc
-    adc #3
+    adc #2
     sta 7,s
 
     ; --- Advance phase accumulator ---
@@ -139,18 +131,6 @@ waveRebuildHdmaTable:
     dec a
     sta 9,s
     bne @loop
-
-    ;------------------------------------------------------------------
-    ; Write HDMA terminator ($00)
-    ;------------------------------------------------------------------
-    lda 7,s                     ;
-    tax                         ; final output pointer position
-    sep #$20
-.accu 8
-    lda #$00
-    sta.l $7E0000,x             ; terminator byte
-    rep #$20
-.accu 16
 
     ;------------------------------------------------------------------
     ; Cleanup: deallocate locals, restore bank, return

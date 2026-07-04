@@ -1,6 +1,7 @@
 #include "wave.h"
 
 u8 wave_hdma_table[WAVE_HDMA_BUF_SIZE];
+u8 wave_indirect_table[7];
 WaveParams wave;
 
 void waveInit(u8 bg_h, u8 bg_v) {
@@ -11,8 +12,14 @@ void waveInit(u8 bg_h, u8 bg_v) {
     wave.bg_h = bg_h;
     wave.bg_v = bg_v;
     
+    wave_indirect_table[0] = 0x80 | 112;
+    *(u16*)&wave_indirect_table[1] = (u16)wave_hdma_table;
+    wave_indirect_table[3] = 0x80 | 112;
+    *(u16*)&wave_indirect_table[4] = (u16)wave_hdma_table + (112 * 2);
+    wave_indirect_table[6] = 0;
+    
     waveRebuildHdmaTable(wave_hdma_table, &wave);
-    waveSetupHdma(wave_hdma_table, wave.dir, wave.bg_h);
+    waveSetupHdma(wave_indirect_table, wave.dir, wave.bg_h);
 }
 
 void waveUpdate(void) {
@@ -23,16 +30,16 @@ void waveUpdate(void) {
 void waveChangeDir(void) {
     if (wave.dir == WAVE_DIR_HORIZONTAL) {
         wave.dir = WAVE_DIR_VERTICAL;
-        waveSetupHdma(wave_hdma_table, wave.dir, wave.bg_v);
+        waveSetupHdma(wave_indirect_table, wave.dir, wave.bg_v);
     } else {
         wave.dir = WAVE_DIR_HORIZONTAL;
-        waveSetupHdma(wave_hdma_table, wave.dir, wave.bg_h);
+        waveSetupHdma(wave_indirect_table, wave.dir, wave.bg_h);
     }
 }
 
 void waveSetupHdma(u8 *hdma_buf, u8 dir, u8 bg_id) {
     REG_HDMAEN &= ~HDMA_CHANNEL1; /* Disable before configuring */
-    REG_DMAP1 = 0x02;
+    REG_DMAP1 = 0x42;
 
     /* 
      * Registers for BG offsets:
@@ -46,6 +53,8 @@ void waveSetupHdma(u8 *hdma_buf, u8 dir, u8 bg_id) {
 
     REG_A1T1LH = (u16)hdma_buf;
     REG_A1B1 = 0x7E;
+    
+    (*(vuint8*)0x4317) = 0x7E; // REG_DASB1 (Indirect HDMA bank)
 
     REG_HDMAEN |= HDMA_CHANNEL1;
 }
